@@ -424,11 +424,17 @@
       return `${name} 크루 조회사항을 입력해주세요.`;
     }
 
+    function cleanNoticeValue(value) {
+      const text = (value || '').trim();
+      if (text.includes('조회사항을 입력해주세요')) return '';
+      return text;
+    }
+
     const saved = JSON.parse(localStorage.getItem('megaboxCrewData') || 'null');
     const crewData = Object.fromEntries(
       crews.map(name => {
         const savedData = saved?.[name] || {};
-        const cleanedNotice = savedData.notice === defaultNoticeText(name) ? '' : (savedData.notice || '');
+        const cleanedNotice = cleanNoticeValue(savedData.notice);
 
         return [name, {
           ...defaultData[name],
@@ -437,6 +443,9 @@
         }];
       })
     );
+
+    // 예전에 저장된 기본 안내 문구를 모든 크루 데이터에서 완전히 삭제합니다.
+    localStorage.setItem('megaboxCrewData', JSON.stringify(crewData));
 
     let currentCrew = localStorage.getItem('selectedCrew') || crews[0];
     let managerPassword = localStorage.getItem('managerPassword') || '0000';
@@ -529,8 +538,11 @@
 
       selectedName.textContent = `${name} 크루`;
       positionText.textContent = data.position;
-      noticeText.textContent = data.notice || '';
-      noticeCard.style.display = data.notice ? 'block' : 'none';
+      const cleanNotice = cleanNoticeValue(data.notice);
+      data.notice = cleanNotice;
+      noticeText.textContent = cleanNotice;
+      noticeCard.style.display = cleanNotice ? 'block' : 'none';
+      saveData();
       dateTimeText.textContent = data.viewedAt || formatKoreanDate(new Date());
 
       fillAdminForm(name);
@@ -562,7 +574,7 @@
 
     saveBtn.addEventListener('click', () => {
       const name = adminName.value;
-      const noticeValue = adminNotice.value.trim();
+      const noticeValue = cleanNoticeValue(adminNotice.value);
 
       crewData[name] = {
         ...crewData[name],
