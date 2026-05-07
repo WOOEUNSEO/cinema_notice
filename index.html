@@ -507,7 +507,7 @@
       const data = crewData[name];
       adminName.value = name;
       adminPosition.value = data.position;
-      adminNotice.value = data.notice || defaultNoticeText(name);
+      adminNotice.value = data.notice || '';
       adminPassword.value = '';
     }
 
@@ -550,21 +550,11 @@
 
     adminName.addEventListener('change', () => fillAdminForm(adminName.value));
 
-    adminNotice.addEventListener('focus', () => {
-      if (adminNotice.value === defaultNoticeText(adminName.value)) {
-        adminNotice.value = '';
-      }
-    });
-
-    adminNotice.addEventListener('blur', () => {
-      if (adminNotice.value.trim() === '') {
-        adminNotice.value = defaultNoticeText(adminName.value);
-      }
-    });
+    
 
     saveBtn.addEventListener('click', () => {
       const name = adminName.value;
-      const noticeValue = adminNotice.value.trim() === defaultNoticeText(name) ? '' : adminNotice.value.trim();
+      const noticeValue = adminNotice.value.trim();
 
       crewData[name] = {
         ...crewData[name],
