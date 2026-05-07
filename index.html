@@ -6,7 +6,7 @@
   <title>MEGABOX COEX THE BOUTIQUE | 오늘의 크루</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;700&family=Pretendard:wght@400;500;700&display=swap');
-
+    
     :root {
       --green-950: #061611;
       --green-900: #09231b;
@@ -448,6 +448,15 @@
       })
     );
 
+    const firebaseConfig = {
+  apiKey: "AIzaSy...",
+  authDomain: "megabox-crew.firebaseapp.com",
+  projectId: "megabox-crew",
+  storageBucket: "megabox-crew.appspot.com",
+  messagingSenderId: "123456789",
+  appId: "1:123456789:web:abc123"
+};
+    
     // 예전에 저장된 기본 안내 문구를 모든 크루 데이터에서 완전히 삭제합니다.
     localStorage.setItem('megaboxCrewData', JSON.stringify(crewData));
 
