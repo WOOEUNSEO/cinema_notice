@@ -379,7 +379,7 @@
         </div>
 
         <div class="info-grid">
-          <article class="info-card notice-card">
+          <article class="info-card notice-card" id="noticeCard">
             <div class="info-label">조회사항</div>
             <p class="notice" id="noticeText"></p>
           </article>
@@ -426,10 +426,16 @@
 
     const saved = JSON.parse(localStorage.getItem('megaboxCrewData') || 'null');
     const crewData = Object.fromEntries(
-      crews.map(name => [name, {
-        ...defaultData[name],
-        ...(saved?.[name] || {})
-      }])
+      crews.map(name => {
+        const savedData = saved?.[name] || {};
+        const cleanedNotice = savedData.notice === defaultNoticeText(name) ? '' : (savedData.notice || '');
+
+        return [name, {
+          ...defaultData[name],
+          ...savedData,
+          notice: cleanedNotice
+        }];
+      })
     );
 
     let currentCrew = localStorage.getItem('selectedCrew') || crews[0];
@@ -441,6 +447,7 @@
     const selectedName = document.getElementById('selectedName');
     const positionText = document.getElementById('positionText');
     const noticeText = document.getElementById('noticeText');
+    const noticeCard = document.getElementById('noticeCard');
     const dateTimeText = document.getElementById('dateTimeText');
     const adminDetails = document.getElementById('adminDetails');
     const adminSummary = document.getElementById('adminSummary');
@@ -523,6 +530,7 @@
       selectedName.textContent = `${name} 크루`;
       positionText.textContent = data.position;
       noticeText.textContent = data.notice || '';
+      noticeCard.style.display = data.notice ? 'block' : 'none';
       dateTimeText.textContent = data.viewedAt || formatKoreanDate(new Date());
 
       fillAdminForm(name);
