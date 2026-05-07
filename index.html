@@ -1,0 +1,560 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MEGABOX COEX THE BOUTIQUE | 오늘의 크루</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;700&family=Pretendard:wght@400;500;700&display=swap');
+
+    :root {
+      --green-950: #061611;
+      --green-900: #09231b;
+      --green-800: #0d3428;
+      --gold: #d7b56d;
+      --gold-soft: #f3dfa2;
+      --white-soft: rgba(255, 255, 255, 0.86);
+      --glass-border: rgba(255, 255, 255, 0.26);
+      --shadow: rgba(0, 0, 0, 0.48);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Pretendard, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--white-soft);
+      background:
+        radial-gradient(circle at 50% 0%, rgba(247, 214, 138, 0.18), transparent 22%),
+        radial-gradient(circle at 14% 18%, rgba(255, 255, 255, 0.08), transparent 20%),
+        linear-gradient(135deg, #020806 0%, var(--green-950) 35%, var(--green-800) 100%);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px),
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 64px 64px;
+      mask-image: linear-gradient(to bottom, black, transparent 78%);
+    }
+
+    .page {
+      width: min(920px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 36px 0 30px;
+    }
+
+    .screen {
+      display: none;
+      min-height: calc(100vh - 66px);
+    }
+
+    .screen.active {
+      display: block;
+      animation: fadeIn 0.34s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero {
+      position: relative;
+      min-height: 220px;
+      border: 1px solid rgba(215, 181, 109, 0.28);
+      border-radius: 32px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02)),
+        linear-gradient(135deg, rgba(8, 35, 27, 0.92), rgba(2, 8, 6, 0.86));
+      box-shadow: 0 34px 90px var(--shadow);
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 42px 24px;
+    }
+
+    .hero::before, .hero::after {
+      content: "";
+      position: absolute;
+      top: -80px;
+      width: 210px;
+      height: 520px;
+      background: radial-gradient(ellipse at top, rgba(255, 227, 154, 0.28), transparent 64%);
+      filter: blur(2px);
+      transform: rotate(10deg);
+    }
+
+    .hero::before { left: 9%; }
+    .hero::after { right: 9%; transform: rotate(-10deg); }
+
+    .logo-mark {
+      width: 52px;
+      height: 52px;
+      margin: 0 auto 16px;
+      border: 2px solid var(--gold);
+      border-radius: 16px 16px 4px 4px;
+      transform: rotate(45deg);
+      opacity: 0.92;
+    }
+
+    .brand {
+      position: relative;
+      z-index: 1;
+      font-family: 'Noto Serif KR', serif;
+      letter-spacing: 0.16em;
+      color: var(--gold-soft);
+      text-shadow: 0 0 28px rgba(215,181,109,0.36);
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: clamp(2rem, 6vw, 4.2rem);
+      line-height: 1;
+      font-weight: 700;
+    }
+
+    .brand p {
+      margin: 14px 0 0;
+      font-size: clamp(0.72rem, 2vw, 0.98rem);
+      letter-spacing: 0.34em;
+    }
+
+    .panel {
+      border: 1px solid var(--glass-border);
+      border-radius: 28px;
+      background: linear-gradient(145deg, rgba(255,255,255,0.15), rgba(255,255,255,0.055));
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      box-shadow: 0 24px 70px rgba(0,0,0,0.34);
+    }
+
+    .selector {
+      width: min(430px, 100%);
+      margin: 24px auto 0;
+      padding: 24px;
+      background: linear-gradient(145deg, rgba(255,255,255,0.18), rgba(255,255,255,0.07));
+    }
+
+    .section-title {
+      margin: 0 0 16px;
+      font-family: 'Noto Serif KR', serif;
+      color: var(--gold-soft);
+      font-size: 1.18rem;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .crew-list {
+      display: grid;
+      gap: 9px;
+      max-height: 560px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .crew-btn {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,0.26);
+      border-radius: 16px;
+      padding: 13px 14px;
+      background: rgba(255,255,255,0.11);
+      color: rgba(255,255,255,0.9);
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.24s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .crew-btn:hover {
+      border-color: rgba(215,181,109,0.88);
+      background: rgba(215,181,109,0.18);
+      color: var(--gold-soft);
+      transform: translateY(-1px);
+      box-shadow: 0 14px 28px rgba(0,0,0,0.25);
+    }
+
+    .content {
+      width: min(760px, 100%);
+      margin: 24px auto 0;
+      padding: 28px;
+      min-height: 520px;
+    }
+
+    .top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .selected-name {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      padding: 9px 14px;
+      border: 1px solid rgba(215,181,109,0.36);
+      border-radius: 999px;
+      background: rgba(215,181,109,0.11);
+      color: var(--gold-soft);
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    .back-btn {
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 14px;
+      padding: 9px 13px;
+      background: rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.86);
+      cursor: pointer;
+    }
+
+    .position-wrap {
+      margin-top: 28px;
+      text-align: center;
+      padding: 34px 20px;
+      border-top: 1px solid rgba(215,181,109,0.36);
+      border-bottom: 1px solid rgba(215,181,109,0.18);
+    }
+
+    .eyebrow {
+      margin: 0 0 14px;
+      color: var(--gold);
+      font-size: 0.95rem;
+      letter-spacing: 0.12em;
+    }
+
+    .position {
+      margin: 0;
+      font-family: 'Noto Serif KR', serif;
+      font-size: clamp(2.2rem, 7vw, 4.4rem);
+      color: var(--gold-soft);
+      line-height: 1;
+      text-shadow: 0 0 34px rgba(215,181,109,0.25);
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    .info-card {
+      min-height: 145px;
+      border: 1px solid rgba(215,181,109,0.24);
+      border-radius: 22px;
+      background: rgba(2, 16, 12, 0.36);
+      padding: 20px;
+    }
+
+    .info-card.notice-card { grid-column: 1 / -1; }
+
+    .info-label {
+      color: var(--gold);
+      font-size: 0.92rem;
+      font-weight: 700;
+      margin-bottom: 13px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(215,181,109,0.18);
+    }
+
+    .notice {
+      margin: 0;
+      font-size: 1rem;
+      line-height: 1.6;
+      word-break: keep-all;
+    }
+
+    .date-time {
+      font-size: 1.12rem;
+      font-family: 'Noto Serif KR', serif;
+      color: rgba(255,255,255,0.82);
+    }
+
+    .admin {
+      margin-top: 22px;
+      border-top: 1px solid rgba(255,255,255,0.12);
+      padding-top: 20px;
+    }
+
+    .admin summary {
+      cursor: pointer;
+      color: rgba(255,255,255,0.68);
+      margin-bottom: 14px;
+      font-size: 0.92rem;
+    }
+
+    .form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,0.22);
+      border-radius: 14px;
+      background: rgba(0,0,0,0.22);
+      color: white;
+      padding: 11px 12px;
+      font: inherit;
+      font-size: 0.95rem;
+    }
+
+    textarea { grid-column: 1 / -1; min-height: 84px; resize: vertical; }
+
+    .save-btn {
+      grid-column: 1 / -1;
+      border: 0;
+      border-radius: 16px;
+      padding: 13px;
+      color: #102018;
+      background: linear-gradient(135deg, var(--gold-soft), var(--gold));
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .footer {
+      margin-top: 24px;
+      text-align: center;
+      color: rgba(215,181,109,0.72);
+      letter-spacing: 0.34em;
+      font-size: 0.72rem;
+    }
+
+    @media (max-width: 720px) {
+      .page { width: min(100% - 22px, 920px); padding-top: 18px; }
+      .hero { min-height: 180px; border-radius: 24px; }
+      .content, .selector { border-radius: 24px; padding: 20px; }
+      .info-grid, .form { grid-template-columns: 1fr; }
+      .info-card.notice-card { grid-column: auto; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="screen active" id="selectScreen">
+      <section class="hero">
+        <div class="brand">
+          <div class="logo-mark"></div>
+          <h1>MEGABOX</h1>
+          <p>COEX THE BOUTIQUE</p>
+        </div>
+      </section>
+
+      <aside class="panel selector">
+        <h2 class="section-title">오늘의 크루 선택</h2>
+        <div class="crew-list" id="crewList"></div>
+      </aside>
+    </section>
+
+    <section class="screen" id="detailScreen">
+      <section class="hero">
+        <div class="brand">
+          <div class="logo-mark"></div>
+          <h1>MEGABOX</h1>
+          <p>COEX THE BOUTIQUE</p>
+        </div>
+      </section>
+
+      <section class="panel content">
+        <div class="top-row">
+          <div class="selected-name" id="selectedName">은서 크루</div>
+          <button class="back-btn" id="backBtn">← 이름 선택</button>
+        </div>
+
+        <div class="position-wrap">
+          <p class="eyebrow">오늘의 포지션</p>
+          <h2 class="position" id="positionText">카페</h2>
+        </div>
+
+        <div class="info-grid">
+          <article class="info-card notice-card">
+            <div class="info-label">조회사항</div>
+            <p class="notice" id="noticeText">개인별 조회사항을 입력해주세요.</p>
+          </article>
+
+          <article class="info-card">
+            <div class="info-label">조회일시</div>
+            <div class="date-time" id="dateTimeText"></div>
+          </article>
+        </div>
+
+        <details class="admin">
+          <summary>관리자용: 오늘의 내용 수정</summary>
+          <div class="form">
+            <select id="adminName"></select>
+            <select id="adminPosition">
+              <option value="카페">카페</option>
+              <option value="데스크">데스크</option>
+            </select>
+            <textarea id="adminNotice" placeholder="개인별 조회사항"></textarea>
+            <input id="adminPassword" type="password" placeholder="새 비밀번호 설정" />
+            <button class="save-btn" id="saveBtn">저장하기</button>
+          </div>
+        </details>
+      </section>
+    </section>
+
+    <footer class="footer">MEGABOX COEX THE BOUTIQUE</footer>
+  </main>
+
+  <script>
+    const crews = ['은서', '나진', '규영', '연우', '정우', '수빈', '현준', '가은', '지흔', '대진', '현수', '영민', '광훈'];
+
+    const defaultData = Object.fromEntries(
+      crews.map((name, index) => [name, {
+        position: index % 2 === 0 ? '카페' : '데스크',
+        notice: `${name} 크루 조회사항을 입력해주세요.`,
+        viewedAt: '',
+        password: '0000'
+      }])
+    );
+
+    function defaultNoticeText(name) {
+      return `${name} 크루 조회사항을 입력해주세요.`;
+    }
+
+    const saved = JSON.parse(localStorage.getItem('megaboxCrewData') || 'null');
+    const crewData = saved || defaultData;
+    let currentCrew = localStorage.getItem('selectedCrew') || crews[0];
+
+    const selectScreen = document.getElementById('selectScreen');
+    const detailScreen = document.getElementById('detailScreen');
+    const crewList = document.getElementById('crewList');
+    const selectedName = document.getElementById('selectedName');
+    const positionText = document.getElementById('positionText');
+    const noticeText = document.getElementById('noticeText');
+    const dateTimeText = document.getElementById('dateTimeText');
+    const adminName = document.getElementById('adminName');
+    const adminPosition = document.getElementById('adminPosition');
+    const adminNotice = document.getElementById('adminNotice');
+    const adminPassword = document.getElementById('adminPassword');
+    const saveBtn = document.getElementById('saveBtn');
+    const backBtn = document.getElementById('backBtn');
+    const adminDetails = document.querySelector('.admin');
+
+    function formatKoreanDate(date) {
+      const days = ['일', '월', '화', '수', '목', '금', '토'];
+      const yyyy = date.getFullYear();
+      const mm = String(date.getMonth() + 1).padStart(2, '0');
+      const dd = String(date.getDate()).padStart(2, '0');
+      const day = days[date.getDay()];
+      const hh = String(date.getHours()).padStart(2, '0');
+      const min = String(date.getMinutes()).padStart(2, '0');
+      return `${yyyy}.${mm}.${dd} (${day}) ${hh}:${min}`;
+    }
+
+    function saveData() {
+      localStorage.setItem('megaboxCrewData', JSON.stringify(crewData));
+      localStorage.setItem('selectedCrew', currentCrew);
+    }
+
+    function showScreen(screenName) {
+      selectScreen.classList.toggle('active', screenName === 'select');
+      detailScreen.classList.toggle('active', screenName === 'detail');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function renderCrewButtons() {
+      crewList.innerHTML = '';
+      crews.forEach(name => {
+        const btn = document.createElement('button');
+        btn.className = 'crew-btn';
+        btn.textContent = name;
+        btn.onclick = () => {
+          const password = prompt(`${name} 크루 비밀번호를 입력하세요`);
+
+          if (password === null) return;
+
+          if (password === crewData[name].password) {
+            selectCrew(name, true);
+            showScreen('detail');
+          } else {
+            alert('비밀번호가 올바르지 않습니다.');
+          }
+        };
+        crewList.appendChild(btn);
+      });
+    }
+
+    function renderAdminSelect() {
+      adminName.innerHTML = '';
+      crews.forEach(name => {
+        const option = document.createElement('option');
+        option.value = name;
+        option.textContent = name;
+        adminName.appendChild(option);
+      });
+    }
+
+    function fillAdminForm(name) {
+      const data = crewData[name];
+      adminName.value = name;
+      adminPosition.value = data.position;
+      adminNotice.value = data.notice;
+      adminPassword.value = data.password;
+    }
+
+    function selectCrew(name, updateTime = false) {
+      currentCrew = name;
+      const data = crewData[name];
+
+      if (updateTime) {
+        data.viewedAt = formatKoreanDate(new Date());
+      }
+
+      selectedName.textContent = `${name} 크루`;
+      positionText.textContent = data.position;
+      noticeText.textContent = data.notice;
+      dateTimeText.textContent = data.viewedAt || formatKoreanDate(new Date());
+
+      fillAdminForm(name);
+      saveData();
+    }
+
+    adminName.addEventListener('change', () => fillAdminForm(adminName.value));
+
+    adminNotice.addEventListener('focus', () => {
+      if (adminNotice.value === defaultNoticeText(adminName.value)) {
+        adminNotice.value = '';
+      }
+    });
+
+    adminNotice.addEventListener('blur', () => {
+      if (adminNotice.value.trim() === '') {
+        adminNotice.value = defaultNoticeText(adminName.value);
+      }
+    });
+
+    saveBtn.addEventListener('click', () => {
+      const name = adminName.value;
+      crewData[name] = {
+        ...crewData[name],
+        position: adminPosition.value || '카페',
+        notice: adminNotice.value.trim() || defaultNoticeText(name),
+        password: adminPassword.value.trim() || crewData[name].password
+      };
+      currentCrew = name;
+      selectCrew(name, false);
+      adminDetails.open = false;
+      alert('저장되었습니다.');
+    });
+
+    backBtn.addEventListener('click', () => showScreen('select'));
+
+    renderAdminSelect();
+    renderCrewButtons();
+    selectCrew(currentCrew, false);
+  </script>
+</body>
+</html>
