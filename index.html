@@ -425,7 +425,15 @@
     }
 
     const saved = JSON.parse(localStorage.getItem('megaboxCrewData') || 'null');
-    const crewData = saved || defaultData;
+
+    // 기존에 저장된 데이터가 있어도 새로 추가된 password 값이 없으면 기본값 0000을 넣어줍니다.
+    const crewData = Object.fromEntries(
+      crews.map(name => [name, {
+        ...defaultData[name],
+        ...(saved?.[name] || {}),
+        password: saved?.[name]?.password || '0000'
+      }])
+    );
     let currentCrew = localStorage.getItem('selectedCrew') || crews[0];
 
     const selectScreen = document.getElementById('selectScreen');
