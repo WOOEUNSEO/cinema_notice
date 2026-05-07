@@ -426,7 +426,11 @@
 
     function cleanNoticeValue(value) {
       const text = (value || '').trim();
+
+      // 예전에 저장된 기본 안내 문구는 실제 조회사항이 아니므로 모든 크루에게 공백 처리합니다.
       if (text.includes('조회사항을 입력해주세요')) return '';
+      if (text.includes('크루 조회사항')) return '';
+
       return text;
     }
 
@@ -523,7 +527,8 @@
       const data = crewData[name];
       adminName.value = name;
       adminPosition.value = data.position;
-      adminNotice.value = data.notice || '';
+      adminNotice.value = cleanNoticeValue(data.notice);
+      adminNotice.placeholder = `${name} 크루 조회사항을 입력해주세요.`;
       adminPassword.value = '';
     }
 
@@ -541,7 +546,7 @@
       const cleanNotice = cleanNoticeValue(data.notice);
       data.notice = cleanNotice;
       noticeText.textContent = cleanNotice;
-      noticeCard.style.display = cleanNotice ? 'block' : 'none';
+      noticeCard.style.display = 'block';
       saveData();
       dateTimeText.textContent = data.viewedAt || formatKoreanDate(new Date());
 
