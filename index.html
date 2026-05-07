@@ -272,6 +272,7 @@
       font-size: 1rem;
       line-height: 1.6;
       word-break: keep-all;
+      min-height: 1.6em;
     }
 
     .date-time {
@@ -380,7 +381,7 @@
         <div class="info-grid">
           <article class="info-card notice-card">
             <div class="info-label">조회사항</div>
-            <p class="notice" id="noticeText">개인별 조회사항을 입력해주세요.</p>
+            <p class="notice" id="noticeText"></p>
           </article>
 
           <article class="info-card">
@@ -389,8 +390,8 @@
           </article>
         </div>
 
-        <details class="admin">
-          <summary>관리자용: 오늘의 내용 수정</summary>
+        <details class="admin" id="adminDetails">
+          <summary id="adminSummary">관리자용: 오늘의 내용 수정</summary>
           <div class="form">
             <select id="adminName"></select>
             <select id="adminPosition">
@@ -398,7 +399,7 @@
               <option value="데스크">데스크</option>
             </select>
             <textarea id="adminNotice" placeholder="개인별 조회사항"></textarea>
-            <input id="adminPassword" type="password" placeholder="새 비밀번호 설정" />
+            <input id="adminPassword" type="password" placeholder="새 관리자 비밀번호 설정" />
             <button class="save-btn" id="saveBtn">저장하기</button>
           </div>
         </details>
@@ -414,9 +415,8 @@
     const defaultData = Object.fromEntries(
       crews.map((name, index) => [name, {
         position: index % 2 === 0 ? '카페' : '데스크',
-        notice: `${name} 크루 조회사항을 입력해주세요.`,
-        viewedAt: '',
-        password: '0000'
+        notice: '',
+        viewedAt: ''
       }])
     );
 
@@ -425,16 +425,15 @@
     }
 
     const saved = JSON.parse(localStorage.getItem('megaboxCrewData') || 'null');
-
-    // 기존에 저장된 데이터가 있어도 새로 추가된 password 값이 없으면 기본값 0000을 넣어줍니다.
     const crewData = Object.fromEntries(
       crews.map(name => [name, {
         ...defaultData[name],
-        ...(saved?.[name] || {}),
-        password: saved?.[name]?.password || '0000'
+        ...(saved?.[name] || {})
       }])
     );
+
     let currentCrew = localStorage.getItem('selectedCrew') || crews[0];
+    let managerPassword = localStorage.getItem('managerPassword') || '0000';
 
     const selectScreen = document.getElementById('selectScreen');
     const detailScreen = document.getElementById('detailScreen');
@@ -443,13 +442,14 @@
     const positionText = document.getElementById('positionText');
     const noticeText = document.getElementById('noticeText');
     const dateTimeText = document.getElementById('dateTimeText');
+    const adminDetails = document.getElementById('adminDetails');
+    const adminSummary = document.getElementById('adminSummary');
     const adminName = document.getElementById('adminName');
     const adminPosition = document.getElementById('adminPosition');
     const adminNotice = document.getElementById('adminNotice');
     const adminPassword = document.getElementById('adminPassword');
     const saveBtn = document.getElementById('saveBtn');
     const backBtn = document.getElementById('backBtn');
-    const adminDetails = document.querySelector('.admin');
 
     function formatKoreanDate(date) {
       const days = ['일', '월', '화', '수', '목', '금', '토'];
@@ -467,7 +467,13 @@
       localStorage.setItem('selectedCrew', currentCrew);
     }
 
+    function closeAdmin() {
+      adminDetails.open = false;
+      adminPassword.value = '';
+    }
+
     function showScreen(screenName) {
+      closeAdmin();
       selectScreen.classList.toggle('active', screenName === 'select');
       detailScreen.classList.toggle('active', screenName === 'detail');
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -480,16 +486,8 @@
         btn.className = 'crew-btn';
         btn.textContent = name;
         btn.onclick = () => {
-          const password = prompt(`${name} 크루 비밀번호를 입력하세요`);
-
-          if (password === null) return;
-
-          if (password === crewData[name].password) {
-            selectCrew(name, true);
-            showScreen('detail');
-          } else {
-            alert('비밀번호가 올바르지 않습니다.');
-          }
+          selectCrew(name, true);
+          showScreen('detail');
         };
         crewList.appendChild(btn);
       });
@@ -509,11 +507,12 @@
       const data = crewData[name];
       adminName.value = name;
       adminPosition.value = data.position;
-      adminNotice.value = data.notice;
-      adminPassword.value = data.password;
+      adminNotice.value = data.notice || defaultNoticeText(name);
+      adminPassword.value = '';
     }
 
     function selectCrew(name, updateTime = false) {
+      closeAdmin();
       currentCrew = name;
       const data = crewData[name];
 
@@ -523,12 +522,31 @@
 
       selectedName.textContent = `${name} 크루`;
       positionText.textContent = data.position;
-      noticeText.textContent = data.notice;
+      noticeText.textContent = data.notice || '';
       dateTimeText.textContent = data.viewedAt || formatKoreanDate(new Date());
 
       fillAdminForm(name);
       saveData();
     }
+
+    adminSummary.addEventListener('click', (event) => {
+      event.preventDefault();
+
+      if (adminDetails.open) {
+        closeAdmin();
+        return;
+      }
+
+      const inputPassword = prompt('관리자 비밀번호를 입력하세요');
+      if (inputPassword === null) return;
+
+      if (inputPassword === managerPassword) {
+        adminDetails.open = true;
+        fillAdminForm(currentCrew);
+      } else {
+        alert('관리자 비밀번호가 올바르지 않습니다.');
+      }
+    });
 
     adminName.addEventListener('change', () => fillAdminForm(adminName.value));
 
@@ -546,15 +564,23 @@
 
     saveBtn.addEventListener('click', () => {
       const name = adminName.value;
+      const noticeValue = adminNotice.value.trim() === defaultNoticeText(name) ? '' : adminNotice.value.trim();
+
       crewData[name] = {
         ...crewData[name],
         position: adminPosition.value || '카페',
-        notice: adminNotice.value.trim() || defaultNoticeText(name),
-        password: adminPassword.value.trim() || crewData[name].password
+        notice: noticeValue
       };
+
+      if (adminPassword.value.trim()) {
+        managerPassword = adminPassword.value.trim();
+        localStorage.setItem('managerPassword', managerPassword);
+        adminPassword.value = '';
+      }
+
       currentCrew = name;
       selectCrew(name, false);
-      adminDetails.open = false;
+      closeAdmin();
       alert('저장되었습니다.');
     });
 
